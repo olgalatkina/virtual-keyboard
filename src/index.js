@@ -40,6 +40,7 @@ const createKeyboard = () => {
       keyboardKey.className = 'keyboard__key';
       if (typeof key === 'number') {
         keyboardKey.innerHTML = String.fromCharCode(key);
+        keyboardKey.setAttribute('data', key);
       } else {
         if (key === 'Enter' || key === 'Ctrl' || key === 'Win' || key === 'Alt') {
           keyboardKey.className = 'keyboard__key keyboard__key_wide';
@@ -66,8 +67,26 @@ const createKeyboard = () => {
   addElementToDom(section);
 };
 
+const addKeyPressHandler = () => {
+  // document.onkeypress = function (evt) {
+  //   console.log(evt.code);
+  //   console.log(evt.keyCode);
+  // };
+
+  document.querySelector('.keyboard').addEventListener('keydown', (event) => {
+    const clickedKey = event.target;
+    console.log(clickedKey);
+    if (event.target.classList.contains('keyboard__key')) {
+      const clickedKey = event.target;
+      console.log(clickedKey);
+      clickedKey.classList.add('active');
+    }
+  });
+};
+
 window.onload = () => {
   addStyleLink('./src/css/style.css');
   addStyleLink('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
   createKeyboard();
+  addKeyPressHandler();
 };
