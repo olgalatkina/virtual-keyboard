@@ -104,7 +104,7 @@ const capsLockHandler = () => {
 };
 
 const shiftHandler = () => {
-  const firstRowEng = ['~', '!', '#', '$', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace'];
+  const firstRowEng = ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace'];
   const firstLine = document.querySelectorAll('.keyboard__row:first-child > .keyboard__key');
   const buttons = document.querySelectorAll('button[id^="Key"]');
 
@@ -169,7 +169,6 @@ const addKeyPressHandler = () => {
     document.querySelectorAll('.keyboard__key').forEach((key) => {
       key.classList.remove('active');
       if (+key.dataset.keyCode === event.keyCode && key.id === event.code) {
-        // console.log(event);
         if (+key.dataset.keyCode === 18) {
           event.preventDefault();
           setFocusOnTextarea();
@@ -186,6 +185,23 @@ const addKeyPressHandler = () => {
   });
 };
 
+const printToTextarea = (clickedKey) => {
+  const textarea = document.querySelector('.textarea');
+  textarea.value += clickedKey.innerHTML;
+};
+
+const addClickHandler = () => {
+  const specialKeys = [8, 9, 13, 16, 17, 18, 20, 32, 37, 38, 39, 40, 46, 91];
+  document.querySelector('.container').addEventListener('click', (evt) => {
+    if (evt.target.classList.contains('keyboard__key')) {
+      const clickedKey = evt.target;
+      if (!specialKeys.includes(+clickedKey.dataset.keyCode)) {
+        printToTextarea(clickedKey);
+      }
+    }
+  });
+};
+
 window.onload = () => {
   addStyleLink('./src/css/style.css');
   addStyleLink('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
@@ -194,4 +210,5 @@ window.onload = () => {
   shiftHandler();
   setFocusOnTextarea();
   addKeyPressHandler();
+  addClickHandler();
 };
