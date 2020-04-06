@@ -35,6 +35,18 @@ const engKeyboard = [
   ['Ctrl', 'Win', 'Alt', 'Space', 'Alt', '&larr;', '&darr;', '&rarr;', 'Ctrl'],
 ];
 
+const ruKeyboard = [
+  ['ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace'],
+  ['tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\', 'Del'],
+  ['Caps&nbsp;lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter'],
+  ['Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', '&uarr;', 'Shift'],
+  ['Ctrl', 'Win', 'Alt', 'Space', 'Alt', '&larr;', '&darr;', '&rarr;', 'Ctrl'],
+];
+
+const context = {
+  isCapsLock: false,
+};
+
 const createKeyboard = () => {
   const section = document.createElement('section');
   section.className = 'container';
@@ -82,21 +94,23 @@ const createKeyboard = () => {
 
 const capsLockHandler = () => {
   const buttons = document.querySelectorAll('button[id^="Key"]');
-  let isCapsLock = false;
 
-  document.addEventListener('keydown', (event) => {
+  document.addEventListener('keyup', (event) => {
+    // event.preventDefault();
     if (event.code === 'CapsLock') {
-      if (!isCapsLock) {
+      if (!context.isCapsLock) {
+        console.log(buttons);
+        context.isCapsLock = true;
         buttons.forEach((btn) => {
           const temp = btn;
-          temp.innerHTML = btn.innerHTML.toUpperCase();
-          isCapsLock = true;
+          temp.innerText = btn.innerText.toUpperCase();
         });
       } else {
+        console.log(buttons);
+        context.isCapsLock = false;
         buttons.forEach((btn) => {
           const temp = btn;
-          temp.innerHTML = btn.innerHTML.toLowerCase();
-          isCapsLock = false;
+          temp.innerText = btn.innerText.toLowerCase();
         });
       }
     }
@@ -105,6 +119,7 @@ const capsLockHandler = () => {
 
 const shiftHandler = () => {
   const firstRowEng = ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace'];
+  const firstRowRu = ['Ё', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '_', '+', 'Backspace'];
   const firstLine = document.querySelectorAll('.keyboard__row:first-child > .keyboard__key');
   const buttons = document.querySelectorAll('button[id^="Key"]');
 
@@ -158,6 +173,63 @@ const shiftHandler = () => {
   });
 };
 
+const clickOnShift = () => {
+  const firstRowEng = ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace'];
+  const firstRowRu = ['Ё', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '_', '+', 'Backspace'];
+  const firstLine = document.querySelectorAll('.keyboard__row:first-child > .keyboard__key');
+  const buttons = document.querySelectorAll('button[id^="Key"]');
+
+  const bracketLeft = document.querySelector('#BracketLeft');
+  const bracketRight = document.querySelector('#BracketRight');
+  const backslash = document.querySelector('#Backslash');
+  const semicolon = document.querySelector('#Semicolon');
+  const quote = document.querySelector('#Quote');
+  const comma = document.querySelector('#Comma');
+  const period = document.querySelector('#Period');
+  const slash = document.querySelector('#Slash');
+
+  document.addEventListener('mousedown', (event) => {
+    const clickedKey = event.target;
+    if (+clickedKey.dataset.keyCode === 16) {
+      buttons.forEach((btn) => {
+        const temp = btn;
+        temp.innerHTML = btn.innerHTML.toUpperCase();
+      });
+      firstLine.forEach((button, i) => {
+        const temp = button;
+        temp.textContent = firstRowEng[i];
+      });
+      bracketLeft.textContent = '{';
+      bracketRight.textContent = '}';
+      backslash.textContent = '|';
+      semicolon.textContent = ':';
+      quote.textContent = '"';
+      comma.textContent = '<';
+      period.textContent = '>';
+      slash.textContent = '?';
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    buttons.forEach((btn) => {
+      const temp = btn;
+      temp.innerHTML = btn.innerHTML.toLowerCase();
+    });
+    firstLine.forEach((button, i) => {
+      const temp = button;
+      temp.textContent = engKeyboard[0][i];
+    });
+    bracketLeft.textContent = '[';
+    bracketRight.textContent = ']';
+    backslash.textContent = '\\';
+    semicolon.textContent = ';';
+    quote.textContent = '\'';
+    comma.textContent = ',';
+    period.textContent = '.';
+    slash.textContent = '/';
+  });
+};
+
 const setFocusOnTextarea = () => {
   const textarea = document.querySelector('.textarea');
   textarea.focus();
@@ -190,13 +262,90 @@ const printToTextarea = (clickedKey) => {
   textarea.value += clickedKey.innerHTML;
 };
 
+const addActive = () => {
+  document.addEventListener('mousedown', (event) => {
+    setFocusOnTextarea();
+    if (event.target.classList.contains('keyboard__key')) {
+      event.target.classList.add('active');
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    document.querySelectorAll('.keyboard__key').forEach((key) => {
+      key.classList.remove('active');
+    });
+  });
+};
+
 const addClickHandler = () => {
+  const textarea = document.querySelector('.textarea');
+  const buttons = document.querySelectorAll('button[id^="Key"]');
   const specialKeys = [8, 9, 13, 16, 17, 18, 20, 32, 37, 38, 39, 40, 46, 91];
+
   document.querySelector('.container').addEventListener('click', (evt) => {
     if (evt.target.classList.contains('keyboard__key')) {
       const clickedKey = evt.target;
       if (!specialKeys.includes(+clickedKey.dataset.keyCode)) {
         printToTextarea(clickedKey);
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'Backspace') {
+        textarea.setRangeText('', textarea.selectionStart - 1, textarea.selectionEnd);
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'CapsLock') {
+        if (!context.isCapsLock) {
+          context.isCapsLock = true;
+          buttons.forEach((btn) => {
+            const temp = btn;
+            temp.innerHTML = btn.innerHTML.toUpperCase();
+          });
+        } else {
+          context.isCapsLock = false;
+          buttons.forEach((btn) => {
+            const temp = btn;
+            temp.innerHTML = btn.innerHTML.toLowerCase();
+          });
+        }
+      }
+      if (clickedKey.id === 'Space') {
+        textarea.value += ' ';
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'Del') {
+        textarea.setRangeText('', textarea.selectionStart, textarea.selectionEnd + 1);
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'Enter') {
+        textarea.value += '\n';
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'Tab') {
+        textarea.value += '\t';
+        setFocusOnTextarea();
+      }
+      if (+clickedKey.dataset.keyCode === 16) {
+        clickOnShift();
+      }
+      if (clickedKey.id === 'ArrowLeft') {
+        textarea.setSelectionRange(textarea.selectionStart - 1, textarea.selectionEnd - 1);
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'ArrowRight') {
+        textarea.setSelectionRange(textarea.selectionStart + 1, textarea.selectionEnd + 1);
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'ArrowUp') {
+        // printToTextarea(clickedKey);
+        textarea.setSelectionRange(textarea.selectionStart = 0, textarea.selectionEnd = 0);
+        setFocusOnTextarea();
+      }
+      if (clickedKey.id === 'ArrowDown') {
+        // printToTextarea(clickedKey);
+        const start = textarea.value.length;
+        const end = textarea.value.length;
+        textarea.setSelectionRange(textarea.selectionStart = start, textarea.selectionEnd = end);
+        setFocusOnTextarea();
       }
     }
   });
@@ -210,5 +359,6 @@ window.onload = () => {
   shiftHandler();
   setFocusOnTextarea();
   addKeyPressHandler();
+  addActive();
   addClickHandler();
 };
