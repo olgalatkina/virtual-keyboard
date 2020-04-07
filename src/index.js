@@ -146,27 +146,49 @@ const context = {
   isCapsLock: false,
 };
 
-const capsLockHandler = () => {
+const capsLockHandler = (isPressed) => {
+  const currLang = localStorage.getItem('lang');
   const buttons = document.querySelectorAll('button[id^="Key"]');
 
-  document.addEventListener('keyup', (event) => {
-    // event.preventDefault();
-    if (event.code === 'CapsLock') {
-      if (!context.isCapsLock) {
-        context.isCapsLock = true;
-        buttons.forEach((btn) => {
-          const temp = btn;
-          temp.innerText = btn.innerText.toUpperCase();
-        });
-      } else {
-        context.isCapsLock = false;
-        buttons.forEach((btn) => {
-          const temp = btn;
-          temp.innerText = btn.innerText.toLowerCase();
-        });
+  const backquote = document.querySelector('#Backquote');
+  const bracketLeft = document.querySelector('#BracketLeft');
+  const bracketRight = document.querySelector('#BracketRight');
+  const semicolon = document.querySelector('#Semicolon');
+  const quote = document.querySelector('#Quote');
+  const comma = document.querySelector('#Comma');
+  const period = document.querySelector('#Period');
+
+  if (!context.isCapsLock) {
+    context.isCapsLock = isPressed;
+    buttons.forEach((btn) => {
+      const temp = btn;
+      temp.innerText = btn.innerText.toUpperCase();
+      if (currLang === 'ru') {
+        backquote.textContent = 'Ё';
+        bracketLeft.textContent = 'Х';
+        bracketRight.textContent = 'Ъ';
+        semicolon.textContent = 'Ж';
+        quote.textContent = 'Э';
+        comma.textContent = 'Б';
+        period.textContent = 'Ю';
       }
-    }
-  });
+    });
+  } else {
+    context.isCapsLock = !isPressed;
+    buttons.forEach((btn) => {
+      const temp = btn;
+      temp.innerText = btn.innerText.toLowerCase();
+      if (currLang === 'ru') {
+        backquote.textContent = 'ё';
+        bracketLeft.textContent = 'х';
+        bracketRight.textContent = 'ъ';
+        semicolon.textContent = 'ж';
+        quote.textContent = 'э';
+        comma.textContent = 'б';
+        period.textContent = 'ю';
+      }
+    });
+  }
 };
 
 const shiftHandler = (isPressed) => {
@@ -178,6 +200,7 @@ const shiftHandler = (isPressed) => {
   const firstLine = document.querySelectorAll('.keyboard__row:first-child > .keyboard__key');
   const buttons = document.querySelectorAll('button[id^="Key"]');
 
+  const backquote = document.querySelector('#Backquote');
   const bracketLeft = document.querySelector('#BracketLeft');
   const bracketRight = document.querySelector('#BracketRight');
   const backslash = document.querySelector('#Backslash');
@@ -196,14 +219,15 @@ const shiftHandler = (isPressed) => {
       const temp = button;
       temp.textContent = symbolsBase[currLang][i];
     });
-    bracketLeft.textContent = '{';
-    bracketRight.textContent = '}';
-    backslash.textContent = '|';
-    semicolon.textContent = ':';
-    quote.textContent = '"';
-    comma.textContent = '<';
-    period.textContent = '>';
-    slash.textContent = '?';
+    backquote.textContent = currLang === 'en' ? '~' : 'Ё';
+    bracketLeft.textContent = currLang === 'en' ? '{' : 'Х';
+    bracketRight.textContent = currLang === 'en' ? '}' : 'Ъ';
+    backslash.textContent = currLang === 'en' ? '|' : '/';
+    semicolon.textContent = currLang === 'en' ? ':' : 'Ж';
+    quote.textContent = currLang === 'en' ? '"' : 'Э';
+    comma.textContent = currLang === 'en' ? '<' : 'Б';
+    period.textContent = currLang === 'en' ? '>' : 'Ю';
+    slash.textContent = currLang === 'en' ? '?' : ',';
   } else if (!isPressed) {
     buttons.forEach((btn) => {
       const temp = btn;
@@ -213,72 +237,16 @@ const shiftHandler = (isPressed) => {
       const temp = button;
       temp.textContent = languageBase[currLang][0][i];
     });
-    bracketLeft.textContent = '[';
-    bracketRight.textContent = ']';
+    backquote.textContent = currLang === 'en' ? '`' : 'ё';
+    bracketLeft.textContent = currLang === 'en' ? '[' : 'х';
+    bracketRight.textContent = currLang === 'en' ? ']' : 'ъ';
     backslash.textContent = '\\';
-    semicolon.textContent = ';';
-    quote.textContent = '\'';
-    comma.textContent = ',';
-    period.textContent = '.';
-    slash.textContent = '/';
+    semicolon.textContent = currLang === 'en' ? ';' : 'ж';
+    quote.textContent = currLang === 'en' ? '\'' : 'э';
+    comma.textContent = currLang === 'en' ? ',' : 'б';
+    period.textContent = currLang === 'en' ? '.' : 'ю';
+    slash.textContent = currLang === 'en' ? '/' : '.';
   }
-};
-
-const clickOnShift = () => {
-  const firstRowEng = ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace'];
-  const firstRowRu = ['Ё', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '_', '+', 'Backspace'];
-  const firstLine = document.querySelectorAll('.keyboard__row:first-child > .keyboard__key');
-  const buttons = document.querySelectorAll('button[id^="Key"]');
-
-  const bracketLeft = document.querySelector('#BracketLeft');
-  const bracketRight = document.querySelector('#BracketRight');
-  const backslash = document.querySelector('#Backslash');
-  const semicolon = document.querySelector('#Semicolon');
-  const quote = document.querySelector('#Quote');
-  const comma = document.querySelector('#Comma');
-  const period = document.querySelector('#Period');
-  const slash = document.querySelector('#Slash');
-
-  document.addEventListener('mousedown', (event) => {
-    const clickedKey = event.target;
-    if (+clickedKey.dataset.keyCode === 16) {
-      buttons.forEach((btn) => {
-        const temp = btn;
-        temp.innerHTML = btn.innerHTML.toUpperCase();
-      });
-      firstLine.forEach((button, i) => {
-        const temp = button;
-        temp.textContent = firstRowEng[i];
-      });
-      bracketLeft.textContent = '{';
-      bracketRight.textContent = '}';
-      backslash.textContent = '|';
-      semicolon.textContent = ':';
-      quote.textContent = '"';
-      comma.textContent = '<';
-      period.textContent = '>';
-      slash.textContent = '?';
-    }
-  });
-
-  document.addEventListener('mouseup', () => {
-    buttons.forEach((btn) => {
-      const temp = btn;
-      temp.innerHTML = btn.innerHTML.toLowerCase();
-    });
-    firstLine.forEach((button, i) => {
-      const temp = button;
-      temp.textContent = engKeyboard[0][i];
-    });
-    bracketLeft.textContent = '[';
-    bracketRight.textContent = ']';
-    backslash.textContent = '\\';
-    semicolon.textContent = ';';
-    quote.textContent = '\'';
-    comma.textContent = ',';
-    period.textContent = '.';
-    slash.textContent = '/';
-  });
 };
 
 const setFocusOnTextarea = () => {
@@ -296,25 +264,33 @@ const setLanguage = (langCode) => {
     localStorage.setItem('lang', langCode);
     createKeyboard(langCode);
   } else {
-    const langCode = localStorage.getItem('lang'); // en
-    const newLang = ['en', 'ru'].join('').replace(langCode, '');
-    localStorage.setItem('lang', newLang);
-    createKeyboard(newLang);
+    const oldLangCode = localStorage.getItem('lang'); // en
+    const newLangCode = ['en', 'ru'].join('').replace(oldLangCode, '');
+    localStorage.setItem('lang', newLangCode);
+    createKeyboard(newLangCode);
   }
 };
 
 const pressedKeys = {};
 
 const addKeyPressHandler = () => {
+  const textarea = document.querySelector('.textarea');
   document.addEventListener('keydown', (event) => {
     setFocusOnTextarea();
     const buttonContainer = document.querySelector(`#${event.code}`);
     if (buttonContainer) {
       buttonContainer.classList.add('active');
       pressedKeys[event.code] = buttonContainer;
+      if (event.code.match(/Alt/)) event.preventDefault();
+      if (event.code.match(/Tab/)) textarea.value += '\t';
+      if (event.code.match(/CapsLock/i)) capsLockHandler(true);
       if (event.code.match(/Shift/i)) shiftHandler(true);
-      if (event.code.match(/Alt/i) && event.ctrlKey) setLanguage();
-      if (!event.code.match(/Alt|Shift|Enter|Backspace|Tab|Delete|Caps|Control|Arrow|Win|Space/)) {
+      if (event.code.match(/Alt/i) && event.ctrlKey) {
+        event.preventDefault();
+        setLanguage();
+        setFocusOnTextarea();
+      }
+      if (!event.code.match(/Alt|Shift|Enter|Backspace|Tab|Delete|Caps|Control|Arrow|MetaLeft|Space/)) {
         event.preventDefault();
         printToTextarea(buttonContainer);
       }
@@ -344,10 +320,9 @@ const addActive = () => {
 
 const addClickHandler = () => {
   const textarea = document.querySelector('.textarea');
-  const buttons = document.querySelectorAll('button[id^="Key"]');
   const specialKeys = [8, 9, 13, 16, 17, 18, 20, 32, 37, 38, 39, 40, 46, 91];
 
-  document.querySelector('.container').addEventListener('click', (evt) => {
+  document.querySelector('.container').addEventListener('mousedown', (evt) => {
     if (evt.target.classList.contains('keyboard__key')) {
       const clickedKey = evt.target;
       if (!specialKeys.includes(+clickedKey.dataset.keyCode)) {
@@ -359,19 +334,7 @@ const addClickHandler = () => {
         setFocusOnTextarea();
       }
       if (clickedKey.id === 'CapsLock') {
-        if (!context.isCapsLock) {
-          context.isCapsLock = true;
-          buttons.forEach((btn) => {
-            const temp = btn;
-            temp.innerHTML = btn.innerHTML.toUpperCase();
-          });
-        } else {
-          context.isCapsLock = false;
-          buttons.forEach((btn) => {
-            const temp = btn;
-            temp.innerHTML = btn.innerHTML.toLowerCase();
-          });
-        }
+        capsLockHandler(true);
       }
       if (clickedKey.id === 'Space') {
         textarea.value += ' ';
@@ -390,7 +353,7 @@ const addClickHandler = () => {
         setFocusOnTextarea();
       }
       if (+clickedKey.dataset.keyCode === 16) {
-        clickOnShift();
+        shiftHandler(true);
       }
       if (clickedKey.id === 'ArrowLeft') {
         textarea.setSelectionRange(textarea.selectionStart - 1, textarea.selectionEnd - 1);
@@ -414,26 +377,16 @@ const addClickHandler = () => {
       }
     }
   });
-};
 
-// const setLanguage = (langCode) => {
-//   if (langCode) {
-//     localStorage.setItem('lang', langCode);
-//     createKeyboard(langCode);
-//   } else {
-//     const langCode = localStorage.getItem('lang'); // en
-//     const newLang = ['en', 'ru'].join('').replace(langCode, '');
-//     localStorage.setItem('lang', newLang);
-//     createKeyboard(newLang);
-//   }
-// };
+  document.querySelector('.container').addEventListener('mouseup', (evt) => {
+    if (+evt.target.dataset.keyCode === 16) shiftHandler(false);
+  });
+};
 
 window.onload = () => {
   addStyleLink('./src/css/style.css');
   addStyleLink('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
   setLanguage('en');
-  capsLockHandler();
-
   setFocusOnTextarea();
   addKeyPressHandler();
   addActive();
