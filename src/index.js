@@ -13,7 +13,7 @@ const addElementToDom = (element) => {
 
 const eventCodes = [
   ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'],
-  ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'Del'],
+  ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'Delete'],
   ['CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter'],
   ['ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ArrowUp', 'ShiftRight'],
   ['ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight'],
@@ -48,13 +48,15 @@ const languageBase = {
   en: engKeyboard,
 };
 
+let textarea = null;
+
 const createKeyboard = (langCode) => {
   const oldSection = document.querySelector('section');
   if (!oldSection) {
     const section = document.createElement('section');
     section.className = 'container';
 
-    const textarea = document.createElement('textarea');
+    textarea = document.createElement('textarea');
     textarea.className = 'textarea';
     textarea.setAttribute('id', 'output');
     section.append(textarea);
@@ -102,42 +104,12 @@ const createKeyboard = (langCode) => {
 
     addElementToDom(section);
   } else {
-    document.querySelector('.keyboard').remove();
-
-    const keyboard = document.createElement('div');
-    keyboard.className = 'keyboard';
-    oldSection.insertBefore(keyboard, document.querySelector('.keyboard__text'));
-
+    const keyboard = document.querySelector('.keyboard');
     keyCods.forEach((row, i) => {
-      const keyboardRow = document.createElement('div');
-      keyboardRow.className = 'keyboard__row';
-
       row.forEach((key, index) => {
-        const keyboardKey = document.createElement('button');
-        keyboardKey.className = 'keyboard__key';
-        keyboardKey.dataset.keyCode = key;
-        keyboardKey.id = eventCodes[i][index];
-
-        if (key === 13 || key === 17 || key === 91 || key === 18) {
-          keyboardKey.className = 'keyboard__key keyboard__key_wide';
-        }
-        if (key === 16) {
-          keyboardKey.className = 'keyboard__key keyboard__key_shift';
-        }
-        if (key === 32) {
-          keyboardKey.className = 'keyboard__key keyboard__key_space';
-        }
-        if (keyboardKey.id === 'ShiftLeft' || keyboardKey.id === 'ControlLeft') {
-          keyboardKey.classList.add('left-alignment');
-        }
-        if (keyboardKey.id === 'ShiftRight' || keyboardKey.id === 'ControlRight') {
-          keyboardKey.classList.add('right-alignment');
-        }
+        const keyboardKey = keyboard.querySelector(`[data-key-code="${key}"]`);
         keyboardKey.innerHTML = languageBase[langCode][i][index];
-        keyboardRow.append(keyboardKey);
       });
-
-      keyboard.append(keyboardRow);
     });
   }
 };
@@ -249,13 +221,7 @@ const shiftHandler = (isPressed) => {
   }
 };
 
-const setFocusOnTextarea = () => {
-  const textarea = document.querySelector('.textarea');
-  textarea.focus();
-};
-
 const printToTextarea = (clickedKey) => {
-  const textarea = document.querySelector('.textarea');
   textarea.value += clickedKey.textContent;
 };
 
@@ -274,10 +240,10 @@ const setLanguage = (langCode) => {
 const pressedKeys = {};
 
 const addKeyPressHandler = () => {
-  const textarea = document.querySelector('.textarea');
   document.addEventListener('keydown', (event) => {
-    setFocusOnTextarea();
+    textarea.focus();
     const buttonContainer = document.querySelector(`#${event.code}`);
+
     if (buttonContainer) {
       buttonContainer.classList.add('active');
       pressedKeys[event.code] = buttonContainer;
@@ -288,7 +254,7 @@ const addKeyPressHandler = () => {
       if (event.code.match(/Alt/i) && event.ctrlKey) {
         event.preventDefault();
         setLanguage();
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (!event.code.match(/Alt|Shift|Enter|Backspace|Tab|Delete|Caps|Control|Arrow|MetaLeft|Space/)) {
         event.preventDefault();
@@ -304,8 +270,8 @@ const addKeyPressHandler = () => {
 };
 
 const addActive = () => {
+  document.addEventListener('click', () => textarea.focus());
   document.addEventListener('mousedown', (event) => {
-    setFocusOnTextarea();
     if (event.target.classList.contains('keyboard__key')) {
       event.target.classList.add('active');
     }
@@ -319,7 +285,6 @@ const addActive = () => {
 };
 
 const addClickHandler = () => {
-  const textarea = document.querySelector('.textarea');
   const specialKeys = [8, 9, 13, 16, 17, 18, 20, 32, 37, 38, 39, 40, 46, 91];
 
   document.querySelector('.container').addEventListener('mousedown', (evt) => {
@@ -327,53 +292,51 @@ const addClickHandler = () => {
       const clickedKey = evt.target;
       if (!specialKeys.includes(+clickedKey.dataset.keyCode)) {
         printToTextarea(clickedKey);
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'Backspace') {
-        textarea.setRangeText('', textarea.selectionStart - 1, textarea.selectionEnd);
-        setFocusOnTextarea();
+        textarea.setRangeText('', textarea.selectionEnd > 0 ? textarea.selectionStart - 1 : 0, textarea.selectionEnd);
+        textarea.focus();
       }
       if (clickedKey.id === 'CapsLock') {
         capsLockHandler(true);
       }
       if (clickedKey.id === 'Space') {
         textarea.value += ' ';
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'Del') {
         textarea.setRangeText('', textarea.selectionStart, textarea.selectionEnd + 1);
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'Enter') {
         textarea.value += '\n';
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'Tab') {
         textarea.value += '\t';
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (+clickedKey.dataset.keyCode === 16) {
         shiftHandler(true);
       }
       if (clickedKey.id === 'ArrowLeft') {
         textarea.setSelectionRange(textarea.selectionStart - 1, textarea.selectionEnd - 1);
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'ArrowRight') {
         textarea.setSelectionRange(textarea.selectionStart + 1, textarea.selectionEnd + 1);
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'ArrowUp') {
-        // printToTextarea(clickedKey);
         textarea.setSelectionRange(textarea.selectionStart = 0, textarea.selectionEnd = 0);
-        setFocusOnTextarea();
+        textarea.focus();
       }
       if (clickedKey.id === 'ArrowDown') {
-        // printToTextarea(clickedKey);
         const start = textarea.value.length;
         const end = textarea.value.length;
         textarea.setSelectionRange(textarea.selectionStart = start, textarea.selectionEnd = end);
-        setFocusOnTextarea();
+        textarea.focus();
       }
     }
   });
@@ -387,7 +350,6 @@ window.onload = () => {
   addStyleLink('./src/css/style.css');
   addStyleLink('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
   setLanguage('en');
-  setFocusOnTextarea();
   addKeyPressHandler();
   addActive();
   addClickHandler();
