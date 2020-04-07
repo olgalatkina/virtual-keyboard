@@ -89,7 +89,7 @@
 
   .active {
     background-color: rgb(114, 160, 245);
-    box-shadow: inset 0 1px 3px 1px rgba(0,0,0,.5), inset 0 0 0 2em rgba(255,255,255,.5);
+    box-shadow: inset 0 1px 3px 1px rgba(0,0,0,.5), inset 0 0 0 3em rgba(255,255,255,.5);
   }
 
   .keyboard__key:hover {
