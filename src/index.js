@@ -43,6 +43,10 @@ const ruKeyboard = [
   ['Ctrl', 'Win', 'Alt', 'Space', 'Alt', '&larr;', '&darr;', '&rarr;', 'Ctrl'],
 ];
 
+localStorage.setItem('lang', 'eng');
+let language = localStorage.getItem('lang');
+console.log(language);
+
 const context = {
   isCapsLock: false,
 };
@@ -55,6 +59,7 @@ const createKeyboard = () => {
   textarea.className = 'textarea';
   textarea.setAttribute('id', 'output');
   section.append(textarea);
+
   const keyboard = document.createElement('div');
   keyboard.className = 'keyboard';
   section.append(keyboard);
@@ -68,6 +73,7 @@ const createKeyboard = () => {
       keyboardKey.className = 'keyboard__key';
       keyboardKey.dataset.keyCode = key;
       keyboardKey.id = eventCodes[i][index];
+
       if (key === 13 || key === 17 || key === 91 || key === 18) {
         keyboardKey.className = 'keyboard__key keyboard__key_wide';
       }
@@ -76,6 +82,12 @@ const createKeyboard = () => {
       }
       if (key === 32) {
         keyboardKey.className = 'keyboard__key keyboard__key_space';
+      }
+      if (keyboardKey.id === 'ShiftLeft' || keyboardKey.id === 'ControlLeft') {
+        keyboardKey.classList.add('left-alignment');
+      }
+      if (keyboardKey.id === 'ShiftRight' || keyboardKey.id === 'ControlRight') {
+        keyboardKey.classList.add('right-alignment');
       }
       keyboardKey.innerHTML = engKeyboard[i][index];
       keyboardRow.append(keyboardKey);
@@ -350,6 +362,33 @@ const addClickHandler = () => {
     }
   });
 };
+
+// function runOnKeys(func, ...codes) {
+//   const pressed = new Set();
+//   document.addEventListener('keydown', (event) => {
+//     pressed.add(event.code);
+//     for (const code of codes) {
+//       if (!pressed.has(code)) {
+//         return;
+//       }
+//     }
+
+//     codes.forEach((code) => {
+//       code.classList.add('active');
+//     });
+
+//     pressed.clear();
+//     func();
+//   });
+
+//   document.addEventListener('keyup', (event) => {
+//     pressed.delete(event.code);
+//   });
+// }
+
+// runOnKeys(() => {
+
+// }, 'ControlLeft', 'AltLeft');
 
 window.onload = () => {
   addStyleLink('./src/css/style.css');
